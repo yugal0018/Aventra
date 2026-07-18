@@ -53,18 +53,29 @@ export async function POST(request: Request) {
       });
     }
 
-    // 3. Create the Job locally under the Importer account
-    const localJob = await prisma.job.create({
-      data: {
+    // 3. Reuse existing Job if already imported previously to avoid duplicate records (DB Optimization)
+    let localJob = await prisma.job.findFirst({
+      where: {
         title: job.title,
-        description: job.description,
         location: job.location,
-        type: job.tags && job.tags.length > 0 ? job.tags.slice(0, 3).join(", ") : "Full-Time",
         companyId: company.id,
-        postedById: importerUser.id,
-        status: "ACTIVE"
+        postedById: importerUser.id
       }
     });
+
+    if (!localJob) {
+      localJob = await prisma.job.create({
+        data: {
+          title: job.title,
+          description: job.description,
+          location: job.location,
+          type: job.tags && job.tags.length > 0 ? job.tags.slice(0, 3).join(", ") : "Full-Time",
+          companyId: company.id,
+          postedById: importerUser.id,
+          status: "ACTIVE"
+        }
+      });
+    }
 
     // 4. Create the JobApplication for the logged-in candidate
     const application = await prisma.jobApplication.create({
@@ -75,6 +86,22 @@ export async function POST(request: Request) {
         notes: `Imported via URL: ${job.url || "Public Search"}`
       }
     });
+
+    // 5. Clean up orphan external jobs to prevent DB bloat (DB Optimization)
+    // Deletes any external board job records that have no active applications.
+    try {
+      await prisma.job.deleteMany({
+        where: {
+          companyId: company.id,
+          postedById: importerUser.id,
+          applications: {
+            none: {}
+          }
+        }
+      });
+    } catch (cleanupError) {
+      console.warn("Orphan cleanup failed (non-blocking):", cleanupError);
+    }
 
     return NextResponse.json({ 
       success: true, 
