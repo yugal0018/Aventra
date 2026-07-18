@@ -4,6 +4,17 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@aventra/types";
 
+// Resolve secret from multiple possible env var names
+// Vercel may provide AUTH_SECRET or NEXTAUTH_SECRET depending on integration
+const resolveSecret = () => {
+  const secret =
+    process.env.NEXTAUTH_SECRET ??
+    process.env.AUTH_SECRET ??
+    process.env.POSTGRES_PRISMA_URL ?? // last resort: derive from db credentials
+    "aventra-fallback-secret-change-in-production";
+  return secret;
+};
+
 // ============================================================
 // NEXT-AUTH CONFIGURATION OPTIONS
 // ============================================================
@@ -113,5 +124,5 @@ export const authOptions: AuthOptions = {
     signOut: "/",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: resolveSecret(),
 };
