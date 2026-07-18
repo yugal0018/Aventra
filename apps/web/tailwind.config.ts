@@ -143,6 +143,23 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-8px)" },
         },
+        // dismiss animations keyframes
+        "dismiss-to-right": {
+          "0%": { opacity: "1", transform: "translateX(0)" },
+          "100%": { opacity: "0", transform: "translateX(100%)" },
+        },
+        "dismiss-to-left": {
+          "0%": { opacity: "1", transform: "translateX(0)" },
+          "100%": { opacity: "0", transform: "translateX(-100%)" },
+        },
+        "dismiss-to-top": {
+          "0%": { opacity: "1", transform: "translateY(0)" },
+          "100%": { opacity: "0", transform: "translateY(-100%)" },
+        },
+        "dismiss-to-bottom": {
+          "0%": { opacity: "1", transform: "translateY(0)" },
+          "100%": { opacity: "0", transform: "translateY(100%)" },
+        },
       },
 
       animation: {
@@ -157,6 +174,10 @@ const config: Config = {
         shimmer: "shimmer 2s linear infinite",
         "pulse-dot": "pulse-dot 2s ease-in-out infinite",
         float: "float 4s ease-in-out infinite",
+        "dismiss-to-right": "dismiss-to-right 0.2s ease-in both",
+        "dismiss-to-left": "dismiss-to-left 0.2s ease-in both",
+        "dismiss-to-top": "dismiss-to-top 0.2s ease-in both",
+        "dismiss-to-bottom": "dismiss-to-bottom 0.2s ease-in both",
       },
 
       // --------------------------------------------------------
