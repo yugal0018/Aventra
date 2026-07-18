@@ -1,0 +1,71 @@
+{
+  "jobs": [
+    {
+      "id": "mock-job-id-1",
+      "title": "Senior Next.js Developer",
+      "description": "Responsible for engineering responsive React web architectures and design token integrations.",
+      "department": "Engineering",
+      "location": "NYC / Remote",
+      "type": "Full-Time",
+      "salaryMin": 120000,
+      "salaryMax": 160000,
+      "status": "ACTIVE",
+      "companyId": "mock-company-id-123",
+      "postedById": "mock-user-id-123",
+      "createdAt": "2026-07-18T00:27:01.579Z",
+      "company": {
+        "name": "Aventra Partners",
+        "logoUrl": null,
+        "website": "https://aventra.io"
+      }
+    }
+  ],
+  "applications": [
+    {
+      "id": "mock-app-id-1",
+      "jobId": "mock-job-id-1",
+      "candidateId": "mock-candidate-user-1",
+      "status": "SCREENING",
+      "notes": "Excellent code style. Verified Github credentials match.",
+      "candidate": {
+        "id": "mock-candidate-user-1",
+        "name": "Jane Doe",
+        "email": "jane.dev@aventra-mock.com",
+        "candidateProfile": {
+          "headline": "Next.js Specialist & UI Architect",
+          "bio": "Proven track record building high-performance serverless apps.",
+          "skills": [
+            "TypeScript",
+            "React",
+            "Next.js",
+            "Tailwind CSS"
+          ],
+          "verified": true
+        }
+      }
+    },
+    {
+      "id": "mock-app-id-2",
+      "jobId": "mock-job-id-1",
+      "candidateId": "mock-candidate-user-2",
+      "status": "SCREENING",
+      "notes": "Applied via waitlist pass link.",
+      "candidate": {
+        "id": "mock-candidate-user-2",
+        "name": "Marcus Aurelius",
+        "email": "marcus.coder@aventra-mock.com",
+        "candidateProfile": {
+          "headline": "Full Stack Engineer",
+          "bio": "Building robust databases and Node.js APIs.",
+          "skills": [
+            "JavaScript",
+            "React",
+            "PostgreSQL",
+            "Prisma"
+          ],
+          "verified": false
+        }
+      }
+    }
+  ]
+}

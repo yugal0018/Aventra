@@ -1,0 +1,196 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum WaitlistRole {
+  CANDIDATE
+  RECRUITER
+  COMPANY
+  AGENCY
+}
+
+enum UserRole {
+  CANDIDATE
+  RECRUITER
+  COMPANY_MEMBER
+  COMPANY_ADMIN
+  AGENCY_MEMBER
+  AGENCY_ADMIN
+}
+
+enum JobStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  OFFER
+  REJECTED
+  PLACED
+}
+
+// ============================================================
+// WAITLIST
+// ============================================================
+
+model WaitlistEntry {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String?
+  role        WaitlistRole @default(CANDIDATE)
+  referredBy  String?
+  createdAt   DateTime     @default(now())
+  confirmedAt DateTime?
+  deletedAt   DateTime?
+
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
+  @@map("waitlist_entries")
+}
+
+// ============================================================
+// USER & CORE RELATIONSHIPS
+// ============================================================
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  passwordHash     String
+  name             String
+  role             UserRole          @default(CANDIDATE)
+  companyId        String?
+  company          Company?          @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  agencyId         String?
+  agency           Agency?           @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  // Relations
+  candidateProfile CandidateProfile?
+  applications     JobApplication[]
+  postedJobs       Job[]
+  sentMessages     Message[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model CandidateProfile {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline   String?
+  bio        String?
+  skills     String[] // Array of technical competencies
+  experience Json?    // Structured employment history array
+  education  Json?    // Structured academic credentials array
+  verified   Boolean  @default(false)
+  resumeUrl  String?
+  updatedAt  DateTime @updatedAt
+
+  @@map("candidate_profiles")
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  website     String?
+  logoUrl     String?
+  description String?
+  members     User[]
+  jobs        Job[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("companies")
+}
+
+model Agency {
+  id          String   @id @default(uuid())
+  name        String
+  website     String?
+  logoUrl     String?
+  description String?
+  members     User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("agencies")
+}
+
+// ============================================================
+// JOBS & APPLICATIONS
+// ============================================================
+
+model Job {
+  id           String           @id @default(uuid())
+  title        String
+  description  String
+  department   String?
+  location     String
+  type         String           // Full-Time, Contract, Remote, etc.
+  salaryMin    Int?
+  salaryMax    Int?
+  status       JobStatus        @default(DRAFT)
+  companyId    String
+  company      Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  postedById   String
+  postedBy     User             @relation(fields: [postedById], references: [id])
+  applications JobApplication[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@map("jobs")
+}
+
+model JobApplication {
+  id          String            @id @default(uuid())
+  jobId       String
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  candidateId String
+  candidate   User              @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  status      ApplicationStatus @default(APPLIED)
+  notes       String?           // Scorecard comments
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  messages    Message[]
+
+  @@unique([jobId, candidateId])
+  @@index([jobId])
+  @@index([candidateId])
+  @@index([status])
+  @@map("job_applications")
+}
+
+model Message {
+  id            String         @id @default(uuid())
+  applicationId String
+  application   JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        User           @relation(fields: [senderId], references: [id])
+  content       String
+  createdAt     DateTime       @default(now())
+
+  @@map("messages")
+}
