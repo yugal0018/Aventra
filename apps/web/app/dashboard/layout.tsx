@@ -39,6 +39,7 @@ export default async function DashboardLayout({
         ...baseItems,
         { href: "/dashboard/profile", label: "My Profile", icon: "user" },
         { href: "/dashboard/jobs", label: "Browse Jobs", icon: "briefcase" },
+        { href: "/dashboard/discover", label: "Discover (AI)", icon: "search" },
         { href: "/dashboard/applications", label: "Applications", icon: "applications" },
         { href: "/dashboard/messages", label: "Messages", icon: "messages" },
       ];
