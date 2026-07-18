@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 // ============================================================
@@ -22,6 +23,9 @@ const NAV_LINKS = [
 ] as const;
 
 export function Navbar() {
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const pathname = usePathname();
@@ -128,23 +132,40 @@ export function Navbar() {
 
           {/* Desktop CTAs & Mobile Toggle - Far Right */}
           <div className="flex items-center justify-end gap-3 sm:gap-4">
-            <div className="hidden md:flex items-center gap-3">
-              <Button variant="ghost" size="sm" className="font-bold text-slate-600 hover:text-slate-900 rounded-xl" asChild>
-                <Link href="/login">Log in</Link>
-              </Button>
-              <Button
-                size="sm"
-                className="bg-aventra-600 text-white shadow-sm hover:bg-aventra-700 font-bold rounded-xl px-4"
-                asChild
-              >
-                <Link href="/signup">
-                  Join Waitlist
-                  <span aria-hidden="true" className="ml-1">
-                    →
-                  </span>
-                </Link>
-              </Button>
-            </div>
+            {isAuthenticated ? (
+              <div className="hidden md:flex items-center gap-3">
+                <Button
+                  size="sm"
+                  className="bg-aventra-600 text-white shadow-sm hover:bg-aventra-700 font-bold rounded-xl px-4"
+                  asChild
+                >
+                  <Link href="/dashboard">
+                    Go to Console
+                    <span aria-hidden="true" className="ml-1">
+                      →
+                    </span>
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-3">
+                <Button variant="ghost" size="sm" className="font-bold text-slate-600 hover:text-slate-900 rounded-xl" asChild>
+                  <Link href="/login">Log in</Link>
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-aventra-600 text-white shadow-sm hover:bg-aventra-700 font-bold rounded-xl px-4"
+                  asChild
+                >
+                  <Link href="/signup">
+                    Join Waitlist
+                    <span aria-hidden="true" className="ml-1">
+                      →
+                    </span>
+                  </Link>
+                </Button>
+              </div>
+            )}
 
             {/* Mobile Menu Toggle button */}
             <button
@@ -197,19 +218,30 @@ export function Navbar() {
               </ul>
 
               <div className="space-y-3 pt-4 border-t border-slate-100">
-                <Button
-                  variant="outline"
-                  className="w-full justify-center rounded-xl py-3 text-sm font-bold border-slate-200"
-                  asChild
-                >
-                  <Link href="/login">Log in</Link>
-                </Button>
-                <Button
-                  className="w-full justify-center rounded-xl py-3 text-sm font-bold bg-aventra-600 text-white hover:bg-aventra-700"
-                  asChild
-                >
-                  <Link href="/signup">Join Waitlist →</Link>
-                </Button>
+                {isAuthenticated ? (
+                  <Button
+                    className="w-full justify-center rounded-xl py-3 text-sm font-bold bg-aventra-600 text-white hover:bg-aventra-700"
+                    asChild
+                  >
+                    <Link href="/dashboard">Go to Console →</Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center rounded-xl py-3 text-sm font-bold border-slate-200"
+                      asChild
+                    >
+                      <Link href="/login">Log in</Link>
+                    </Button>
+                    <Button
+                      className="w-full justify-center rounded-xl py-3 text-sm font-bold bg-aventra-600 text-white hover:bg-aventra-700"
+                      asChild
+                    >
+                      <Link href="/signup">Join Waitlist →</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
