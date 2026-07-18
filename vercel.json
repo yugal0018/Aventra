@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install --legacy-peer-deps",
   "buildCommand": "npx turbo build --filter=@aventra/web",
-  "outputDirectory": ".next",
+  "outputDirectory": "apps/web/.next",
   "framework": "nextjs"
 }
