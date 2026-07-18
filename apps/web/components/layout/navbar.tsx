@@ -26,9 +26,15 @@ export function Navbar() {
   const { status } = useSession();
   const isAuthenticated = status === "authenticated";
 
+  const pathname = usePathname();
+
+  // Do not render the public landing page navbar on private dashboard console routes
+  if (pathname?.startsWith("/dashboard")) {
+    return null;
+  }
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const pathname = usePathname();
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 12);

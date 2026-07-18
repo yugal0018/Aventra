@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 // ============================================================
 // FOOTER — Comprehensive, brand-anchored
@@ -44,9 +47,16 @@ const SOCIAL_LINKS = [
     label: "LinkedIn",
     ariaLabel: "Aventra on LinkedIn",
   },
-] as const;
+ ] as const;
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Hide the footer inside the dashboard console environment
+  if (pathname?.startsWith("/dashboard")) {
+    return null;
+  }
+
   const currentYear = new Date().getFullYear();
 
   return (
