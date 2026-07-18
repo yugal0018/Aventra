@@ -113,5 +113,5 @@ export const authOptions: AuthOptions = {
     signOut: "/",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || "aventra-local-jwt-encryption-key-secret-512",
+  secret: process.env.NEXTAUTH_SECRET,
 };
