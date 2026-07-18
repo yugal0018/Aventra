@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { DashboardHeader } from "./_components/dashboard-header";
 import { DashboardSidebar } from "./_components/dashboard-sidebar";
+import { SessionTimeout } from "./_components/session-timeout";
 
 // ============================================================
 // DASHBOARD WORKSPACE LAYOUT — Server Component
@@ -69,12 +70,15 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-[calc(100vh-64px)] w-full bg-slate-50/50">
+      {/* Auto Logout Guard */}
+      <SessionTimeout />
+
       {/* Dynamic Role-Based Sidebar */}
       <DashboardSidebar navItems={navItems} user={user} />
 
       {/* Main Workspace Console */}
       <div className="flex-1 flex flex-col min-w-0">
-        <DashboardHeader user={user} />
+        <DashboardHeader user={user} navItems={navItems} />
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
