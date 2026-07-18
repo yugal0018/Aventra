@@ -25,6 +25,7 @@ export default function DiscoverPage() {
   const [previewJob, setPreviewJob] = useState<UnifiedJob | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [savedJobs, setSavedJobs] = useState<Record<string, boolean>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const { toast } = useToast();
 
@@ -277,10 +278,15 @@ export default function DiscoverPage() {
                       }`}
                     >
                       <div className="flex items-start gap-4">
-                        {job.logoUrl ? (
-                          <img src={job.logoUrl} alt={job.company} className="h-10 w-10 rounded-lg object-contain bg-slate-50 border border-slate-100" />
+                        {job.logoUrl && !imageErrors[job.id] ? (
+                          <img 
+                            src={job.logoUrl} 
+                            alt={job.company} 
+                            onError={() => setImageErrors(prev => ({ ...prev, [job.id]: true }))}
+                            className="h-10 w-10 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0" 
+                          />
                         ) : (
-                          <div className="h-10 w-10 rounded-lg bg-aventra-50 border border-aventra-100 flex items-center justify-center font-bold text-aventra-700 text-sm">
+                          <div className="h-10 w-10 rounded-lg bg-aventra-50 border border-aventra-100 flex items-center justify-center font-bold text-aventra-700 text-sm shrink-0">
                             {job.company.charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -449,8 +455,17 @@ export default function DiscoverPage() {
                     <h2 className="font-bold text-slate-900 text-lg leading-tight">{previewJob.title}</h2>
                     <p className="text-xs font-semibold text-slate-600">{previewJob.company}</p>
                   </div>
-                  {previewJob.logoUrl && (
-                    <img src={previewJob.logoUrl} alt={previewJob.company} className="h-10 w-10 rounded-lg object-contain bg-white border border-slate-100 shrink-0" />
+                  {previewJob.logoUrl && !imageErrors[previewJob.id] ? (
+                    <img 
+                      src={previewJob.logoUrl} 
+                      alt={previewJob.company} 
+                      onError={() => setImageErrors(prev => ({ ...prev, [previewJob.id]: true }))}
+                      className="h-10 w-10 rounded-lg object-contain bg-white border border-slate-100 shrink-0" 
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg bg-aventra-50 border border-aventra-100 flex items-center justify-center font-bold text-aventra-700 text-sm shrink-0">
+                      {previewJob.company.charAt(0).toUpperCase()}
+                    </div>
                   )}
                 </div>
 
