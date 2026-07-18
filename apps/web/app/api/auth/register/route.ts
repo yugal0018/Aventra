@@ -3,10 +3,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { RegisterUserSchema } from "@aventra/validators";
 import type { ApiResponse } from "@aventra/types";
+import { generateVerificationToken, sendVerificationEmail } from "@/lib/auth/email-verification";
 
 // ============================================================
 // POST /api/auth/register — Create a new user profile
-// Initializes linked empty profiles (e.g. CandidateProfile)
+// Sends an automated verification email to verify the account.
 // ============================================================
 
 export async function POST(request: NextRequest) {
@@ -45,10 +46,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password with bcryptjs (10 rounds is standard and safe)
+    // Hash password with bcryptjs
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user within database transaction
+    // Create user within database transaction (unverified by default)
     const newUser = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
@@ -56,10 +57,11 @@ export async function POST(request: NextRequest) {
           passwordHash,
           name,
           role,
+          emailVerified: false, // Explicitly unverified initially
         },
       });
 
-      // If user is candidate, automatically initialize profile
+      // If user is candidate, automatically initialize profile (no longer dependent on github verify)
       if (role === "CANDIDATE") {
         await tx.candidateProfile.create({
           data: {
@@ -72,10 +74,18 @@ export async function POST(request: NextRequest) {
       return user;
     });
 
+    // Generate token and trigger verification email
+    try {
+      const vt = await generateVerificationToken(lowerEmail);
+      await sendVerificationEmail(lowerEmail, vt.token);
+    } catch (mailErr) {
+      console.error("Failed to generate token or send email upon registration:", mailErr);
+    }
+
     return NextResponse.json<ApiResponse<{ userId: string }>>(
       {
         success: true,
-        message: "Registration successful! You can now log in.",
+        message: "Registration successful! A verification email has been sent. Please verify your account to log in.",
         data: { userId: newUser.id },
       },
       { status: 201 },
@@ -85,7 +95,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json<ApiResponse<{ userId: string }>>(
       {
         success: true,
-        message: "Registration successful! You can now log in. (Mock Mode)",
+        message: "Registration successful! (Mock Mode - Check email mock logs)",
         data: { userId: "mock-new-user-id" },
       },
       { status: 201 }

@@ -59,7 +59,7 @@ export function generateStrengthsAndRecommendations(
     strengths.push(`Satisfies target experience level (${candidateExp} yrs vs ${requiredExp} yrs req.)`);
   }
   if (isVerified) {
-    strengths.push("Verified GitHub Developer Credentials (trust-certified)");
+    strengths.push("Verified Account Credentials (trust-certified)");
   }
   if (breakdown.location === 5) {
     strengths.push("Optimal workspace/location compatibility");
@@ -73,7 +73,7 @@ export function generateStrengthsAndRecommendations(
 
   // Recommendations
   if (!isVerified) {
-    recommendations.push("Connect GitHub profile to unlock verification trust boost");
+    recommendations.push("Complete profile verification to unlock security trust boost");
   }
   
   if (missingSkills.length > 0) {

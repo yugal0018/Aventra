@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,9 +21,45 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // Email verification resend states
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+
+  // Check URL query parameters securely in useEffect (prevents build-time deoptimization)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("verified") === "true") {
+        toast({
+          variant: "success",
+          title: "Account Verified! 🎉",
+          description: "Your email has been verified. You can now log in.",
+        });
+      }
+
+      const error = params.get("error");
+      if (error === "ExpiredToken") {
+        const emailParam = params.get("email");
+        if (emailParam) setUnverifiedEmail(emailParam);
+        toast({
+          variant: "destructive",
+          title: "Link Expired",
+          description: "Your verification link has expired. Please request a new one.",
+        });
+      } else if (error === "InvalidToken") {
+        toast({
+          variant: "destructive",
+          title: "Invalid Link",
+          description: "This verification link is invalid or has already been used.",
+        });
+      }
+    }
+  }, [toast]);
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFieldErrors({});
+    setUnverifiedEmail(null);
 
     // Validate using Zod schema
     const validationResult = LoginUserSchema.safeParse({ email, password });
@@ -49,11 +85,20 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        toast({
-          variant: "destructive",
-          title: "Authorization Failed",
-          description: res.error || "Incorrect email or password.",
-        });
+        if (res.error === "EmailNotVerified") {
+          setUnverifiedEmail(email);
+          toast({
+            variant: "destructive",
+            title: "Verification Required",
+            description: "Please verify your email address before logging in.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Authorization Failed",
+            description: "Incorrect email or password.",
+          });
+        }
       } else {
         toast({
           variant: "success",
@@ -72,6 +117,42 @@ export default function LoginPage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendEmail = async () => {
+    if (!unverifiedEmail) return;
+
+    setResending(true);
+    try {
+      const res = await fetch("/api/auth/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: unverifiedEmail }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast({
+          variant: "success",
+          title: "Verification Email Sent 📬",
+          description: "Please check your email address for a fresh verification link.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Resend Failed",
+          description: data.message || "Failed to resend verification email.",
+        });
+      }
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Connection error",
+        description: "Failed to connect to verification server.",
+      });
+    } finally {
+      setResending(false);
     }
   };
 
@@ -101,7 +182,7 @@ export default function LoginPage() {
               Enter your email and credentials to enter your console.
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6 pt-0">
+          <CardContent className="p-6 pt-0 space-y-4">
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="login-email">Email Address</Label>
@@ -144,10 +225,31 @@ export default function LoginPage() {
                 />
               </div>
 
+              {/* Inactivity resend alert UI */}
+              {unverifiedEmail && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs space-y-2">
+                  <p className="font-bold text-amber-800">Email Verification Required</p>
+                  <p className="text-slate-600 leading-normal">
+                    Please verify your email address to log in. If you did not receive the verification email, you can request a new one below:
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={resending}
+                    onClick={handleResendEmail}
+                    className="w-full text-xs font-bold border-amber-300 text-amber-800 hover:bg-amber-100/50 h-9 rounded-xl flex items-center justify-center gap-1.5"
+                  >
+                    {resending ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : null}
+                    Resend Verification Email
+                  </Button>
+                </div>
+              )}
+
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-aventra-500 text-white hover:bg-aventra-600 h-10 mt-2"
+                className="w-full bg-aventra-500 text-white hover:bg-aventra-600 h-10 mt-2 rounded-xl font-bold"
               >
                 {isLoading ? "Signing in..." : "Log In"}
               </Button>

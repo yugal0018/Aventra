@@ -67,10 +67,7 @@ export async function GET(request: NextRequest) {
         score += matchCount * 5;
       }
 
-      // Add a +5% trust boost if profile is verified
-      if (profile.verified) {
-        score += 5;
-      }
+
 
       // Clamp score between 60 and 99% for mock realism
       const finalScore = Math.min(Math.max(score, 60), 99);
@@ -83,7 +80,6 @@ export async function GET(request: NextRequest) {
         headline: profile.headline,
         bio: profile.bio,
         skills: profile.skills,
-        verified: profile.verified,
         resumeUrl: profile.resumeUrl,
         matchScore: finalScore,
       };
@@ -110,7 +106,6 @@ export async function GET(request: NextRequest) {
             headline: "Next.js Specialist & UI Architect",
             bio: "Proven track record building high-performance serverless apps.",
             skills: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
-            verified: (global as any)._mockProfileVerified || false,
             resumeUrl: "https://github.com/profile",
             matchScore: 98,
           },
@@ -122,7 +117,6 @@ export async function GET(request: NextRequest) {
             headline: "Full Stack Engineer",
             bio: "Building robust databases and Node.js APIs.",
             skills: ["JavaScript", "React", "PostgreSQL", "Prisma"],
-            verified: false,
             resumeUrl: null,
             matchScore: 84,
           },

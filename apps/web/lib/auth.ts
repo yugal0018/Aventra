@@ -58,6 +58,11 @@ export const authOptions: AuthOptions = {
             throw new Error("Incorrect passcode. Please try again.");
           }
 
+          // Check if email has been verified
+          if (!user.emailVerified) {
+            throw new Error("EmailNotVerified");
+          }
+
           // Return user data for session token encoding
           return {
             id: user.id,

@@ -101,12 +101,12 @@ export async function GET(request: NextRequest) {
           passwordHash: "mock-password-hash",
           name: "Jane Doe",
           role: "CANDIDATE",
+          emailVerified: true,
           candidateProfile: {
             create: {
               headline: "Next.js Specialist & UI Architect",
               bio: "Proven track record building high-performance serverless apps.",
               skills: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
-              verified: true,
             },
           },
         },
@@ -118,12 +118,12 @@ export async function GET(request: NextRequest) {
           passwordHash: "mock-password-hash",
           name: "Marcus Aurelius",
           role: "CANDIDATE",
+          emailVerified: true,
           candidateProfile: {
             create: {
               headline: "Full Stack Engineer",
               bio: "Building robust databases and Node.js APIs.",
               skills: ["JavaScript", "React", "PostgreSQL", "Prisma"],
-              verified: false,
             },
           },
         },

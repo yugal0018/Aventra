@@ -132,7 +132,7 @@ export function calculateCategoryScores(
   // --------------------------------------------------
   // 5. Verification Category (Max 10)
   // --------------------------------------------------
-  const isVerified = !!candidateProfile.verified;
+  const isVerified = !!candidate.emailVerified;
   const verificationScore = isVerified ? 10 : 0;
 
   return {

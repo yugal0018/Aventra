@@ -82,6 +82,7 @@ model User {
   agency           Agency?           @relation(fields: [agencyId], references: [id], onDelete: SetNull)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+  emailVerified    Boolean           @default(false)
   
   // Relations
   candidateProfile CandidateProfile?
@@ -103,7 +104,6 @@ model CandidateProfile {
   skills     String[] // Array of technical competencies
   experience Json?    // Structured employment history array
   education  Json?    // Structured academic credentials array
-  verified   Boolean  @default(false)
   resumeUrl  String?
   updatedAt  DateTime @updatedAt
 
@@ -193,4 +193,15 @@ model Message {
   createdAt     DateTime       @default(now())
 
   @@map("messages")
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email, token])
+  @@map("verification_tokens")
 }
