@@ -26,6 +26,7 @@
         "POSTGRES_PASSWORD",
         "POSTGRES_DATABASE",
         "NEON_PROJECT_ID",
+        "NEON_AUTH_BASE_URL",
         "VITE_NEON_AUTH_URL",
         "NEXTAUTH_SECRET",
         "NEXTAUTH_URL",
