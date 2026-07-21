@@ -31,17 +31,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${baseUrl}/login?error=ExpiredToken&email=${encodeURIComponent(verificationToken.email)}`);
     }
 
-    // 3. Mark user as verified in database
+    // Invalidate/Delete the token so it cannot be reused
     await prisma.$transaction([
       prisma.user.update({
         where: { email: verificationToken.email },
         data: { emailVerified: true },
       }),
-      // 4. Invalidate/Delete the token so it cannot be reused
       prisma.verificationToken.delete({
         where: { token },
       }),
     ]);
+
+    // Sweep expired tokens to keep database storage clean
+    prisma.verificationToken.deleteMany({
+      where: { expiresAt: { lt: new Date() } }
+    }).catch(console.error);
 
     return NextResponse.redirect(`${baseUrl}/login?verified=true`);
   } catch (error) {

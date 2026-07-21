@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateVerificationToken, sendVerificationEmail } from "@/lib/auth/email-verification";
+import { rateLimit, cleanupExpiredRateLimits } from "@/lib/rate-limit";
 import type { ApiResponse } from "@aventra/types";
 
 export async function POST(request: NextRequest) {
   try {
+    // 1. IP Rate Limiting Check
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+    const ipLimitRes = await rateLimit(`resend-ip:${ip}`, 3, 2 * 60 * 1000); // Max 3 resends per 2 min per IP
+    
+    if (!ipLimitRes.success) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          error: "Rate limited",
+          message: "Too many resend attempts from this connection. Please wait 2 minutes before requesting another.",
+        },
+        { status: 429 },
+      );
+    }
+
     const { email } = await request.json();
     if (!email || typeof email !== "string") {
       return NextResponse.json<ApiResponse>(
@@ -15,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const lowerEmail = email.toLowerCase().trim();
 
-    // 1. Check if user exists and is already verified
+    // 2. Check if user exists and is already verified
     const user = await prisma.user.findUnique({
       where: { email: lowerEmail },
     });
@@ -34,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Rate Limiting Check (60 seconds threshold)
+    // 3. Email Specific Rate Limiting Check (60 seconds threshold)
     const existingToken = await prisma.verificationToken.findFirst({
       where: { email: lowerEmail },
     });
@@ -57,7 +73,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Generate token and dispatch verification email
+    // Sweep expired tokens and rate limits to keep database thin
+    cleanupExpiredRateLimits().catch(console.error);
+    prisma.verificationToken.deleteMany({
+      where: { expiresAt: { lt: new Date() } }
+    }).catch(console.error);
+
+    // 4. Generate token and dispatch verification email
     const vt = await generateVerificationToken(lowerEmail);
     await sendVerificationEmail(lowerEmail, vt.token);
 

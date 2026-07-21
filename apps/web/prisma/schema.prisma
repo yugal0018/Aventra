@@ -206,3 +206,15 @@ model VerificationToken {
   @@index([email, token])
   @@map("verification_tokens")
 }
+
+model RateLimit {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  hits      Int      @default(1)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@map("rate_limits")
+}

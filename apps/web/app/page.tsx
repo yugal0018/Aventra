@@ -218,102 +218,12 @@ export default function HomePage() {
           {/* Abstract Interactive/Animated Premium CSS Dashboard Visual */}
           <div className="relative lg:col-span-5">
             <Reveal direction="scale" delay={0.3} className="relative mx-auto max-w-[450px] lg:max-w-none">
-              <div className="relative overflow-hidden rounded-2xl border border-border bg-white shadow-2xl">
-                {/* Header bar */}
-                <div className="flex items-center justify-between border-b border-border bg-slate-50 px-4 py-3">
-                  <div className="flex gap-1.5">
-                    <span className="h-3 w-3 rounded-full bg-red-400" />
-                    <span className="h-3 w-3 rounded-full bg-amber-400" />
-                    <span className="h-3 w-3 rounded-full bg-green-400" />
-                  </div>
-                  <span className="text-[11px] font-mono text-muted-foreground/60 tracking-wider">aventra.io/dashboard</span>
-                  <div className="h-4 w-4 rounded-full bg-zinc-200" />
-                </div>
-
-                {/* Dashboard body mockup */}
-                <div className="p-5 space-y-4 bg-slate-50/50">
-                  {/* Summary Metric cards */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-border/80 bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
-                      <span className="text-xs text-muted-foreground">Match Accuracy</span>
-                      <div className="mt-1 flex items-baseline gap-2">
-                        <span className="text-lg font-bold tracking-tight text-foreground font-mono">98.4%</span>
-                        <span className="text-[10px] font-semibold text-emerald-600 flex items-center"><TrendingUp className="h-3 w-3 mr-0.5" />+2.1%</span>
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-border/80 bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
-                      <span className="text-xs text-muted-foreground">Time to Match</span>
-                      <div className="mt-1 flex items-baseline gap-2">
-                        <span className="text-lg font-bold tracking-tight text-foreground font-mono">1.2d</span>
-                        <span className="text-[10px] font-semibold text-aventra-600">Optimal</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Main activity list */}
-                  <div className="rounded-xl border border-border/80 bg-white p-4 shadow-sm">
-                    <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                      <span className="text-xs font-semibold text-foreground">Top Candidates matched</span>
-                      <span className="text-[10px] text-muted-foreground">Active updates</span>
-                    </div>
-                    <div className="mt-3 space-y-3">
-                      <div className="flex items-center justify-between group">
-                        <div className="flex items-center gap-2.5">
-                          <div className="h-7 w-7 rounded-full bg-aventra-100 flex items-center justify-center text-[10px] font-bold text-aventra-700">JD</div>
-                          <div>
-                            <p className="text-xs font-medium text-foreground">Jane Doe</p>
-                            <p className="text-[9px] text-muted-foreground">Senior Next.js Developer</p>
-                          </div>
-                        </div>
-                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700">97% score</span>
-                      </div>
-                      <div className="flex items-center justify-between group">
-                        <div className="flex items-center gap-2.5">
-                          <div className="h-7 w-7 rounded-full bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-700">MA</div>
-                          <div>
-                            <p className="text-xs font-medium text-foreground">Marcus Aurelius</p>
-                            <p className="text-[9px] text-muted-foreground">Full Stack Architect</p>
-                          </div>
-                        </div>
-                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700">94% score</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Visual Graph / Pipeline Preview */}
-                  <div className="rounded-xl border border-border/80 bg-white p-4 shadow-sm">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Talent Acquisition Pipeline</span>
-                    <div className="mt-3 flex items-center justify-between gap-1.5 h-16">
-                      <div className="flex-1 bg-slate-100 rounded-lg p-2 text-center h-full flex flex-col justify-center border-l-2 border-aventra-500">
-                        <span className="text-[10px] font-bold font-mono">18</span>
-                        <span className="text-[8px] text-muted-foreground">Sourced</span>
-                      </div>
-                      <ChevronRight className="h-3 w-3 text-muted-foreground/40" />
-                      <div className="flex-1 bg-slate-100 rounded-lg p-2 text-center h-full flex flex-col justify-center border-l-2 border-amber-500">
-                        <span className="text-[10px] font-bold font-mono">8</span>
-                        <span className="text-[8px] text-muted-foreground">Screening</span>
-                      </div>
-                      <ChevronRight className="h-3 w-3 text-muted-foreground/40" />
-                      <div className="flex-1 bg-slate-100 rounded-lg p-2 text-center h-full flex flex-col justify-center border-l-2 border-emerald-500">
-                        <span className="text-[10px] font-bold font-mono">3</span>
-                        <span className="text-[8px] text-muted-foreground">Offered</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative floating widgets */}
-              <div className="absolute -left-6 bottom-8 animate-float shadow-xl rounded-lg border border-border bg-white p-3 flex items-center gap-2 z-20">
-                <div className="h-6 w-6 rounded-full bg-emerald-100 flex items-center justify-center"><Check className="h-3 w-3 text-emerald-600" /></div>
-                <div>
-                  <p className="text-[10px] font-bold text-foreground">Candidate Verified</p>
-                  <p className="text-[8px] text-muted-foreground">GitHub + LinkedIn verified</p>
-                </div>
-              </div>
-              <div className="absolute -right-6 top-10 animate-float stagger-2 shadow-xl rounded-lg border border-border bg-white p-3 flex items-center gap-2.5 z-20">
-                <div className="h-2 w-2 rounded-full bg-aventra-500 animate-pulse" />
-                <span className="text-[10px] font-semibold text-foreground">Matched with Stripe</span>
+              <div className="relative overflow-hidden rounded-2xl border border-border bg-white shadow-2xl p-2 bg-slate-50/50">
+                <img
+                  src="/images/hero-illustration.png"
+                  alt="Aventra AI Matching Console Mockup"
+                  className="rounded-xl w-full h-auto object-cover border border-slate-100/60 shadow-sm"
+                />
               </div>
             </Reveal>
           </div>
@@ -632,18 +542,12 @@ export default function HomePage() {
                   Aventra maps candidate credentials, projects, and work history semantically against role criteria. It doesn't look for keyword matches; it understands developer competence.
                 </p>
               </div>
-              <div className="mt-6 border border-border/80 rounded-xl bg-white p-4 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded bg-indigo-50 flex items-center justify-center font-bold text-aventra-600 text-xs">Node</div>
-                  <div>
-                    <p className="text-xs font-bold">Node.js API Specialist</p>
-                    <p className="text-[9px] text-muted-foreground">Match accuracy requirements</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-xs font-bold text-foreground font-mono">98% match</span>
-                </div>
+              <div className="mt-6 border border-border/80 rounded-xl bg-slate-50 overflow-hidden shadow-sm">
+                <img
+                  src="/images/features-illustration.png"
+                  alt="Aventra Smart Match Engine Sourcing Graph"
+                  className="w-full h-36 object-cover"
+                />
               </div>
             </CardContent>
           </Card>
@@ -695,15 +599,12 @@ export default function HomePage() {
                   Allow placement agencies to suggest candidates, log feedback, and coordinate directly with employer representatives. Clean transparency ends the endless email back-and-forth.
                 </p>
               </div>
-              <div className="mt-6 grid grid-cols-2 gap-4 text-xs font-semibold text-muted-foreground">
-                <div className="p-3 bg-white border border-border/80 rounded-xl flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                  Real-time pipeline syncing
-                </div>
-                <div className="p-3 bg-white border border-border/80 rounded-xl flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-indigo-500" />
-                  Placement fee logs
-                </div>
+              <div className="mt-6 border border-border/80 rounded-xl bg-slate-50 overflow-hidden shadow-sm">
+                <img
+                  src="/images/collab-illustration.png"
+                  alt="Recruiter and Candidate Joint Portal Dashboard"
+                  className="w-full h-36 object-cover"
+                />
               </div>
             </CardContent>
           </Card>

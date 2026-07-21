@@ -4,14 +4,37 @@ import { prisma } from "@/lib/prisma";
 import { RegisterUserSchema } from "@aventra/validators";
 import type { ApiResponse } from "@aventra/types";
 import { generateVerificationToken, sendVerificationEmail } from "@/lib/auth/email-verification";
+import { rateLimit, cleanupExpiredRateLimits } from "@/lib/rate-limit";
 
 // ============================================================
 // POST /api/auth/register — Create a new user profile
 // Sends an automated verification email to verify the account.
+// Includes strict IP rate limiting and database garbage collection.
 // ============================================================
 
 export async function POST(request: NextRequest) {
   try {
+    // 1. IP Rate Limiting Check
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+    const limitRes = await rateLimit(`register:${ip}`, 5, 60 * 1000); // 5 hits per 1 min
+    
+    if (!limitRes.success) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          error: "Rate limited",
+          message: "Too many registration attempts. Please wait 60 seconds before trying again.",
+        },
+        { status: 429 },
+      );
+    }
+
+    // Sweep expired tokens and rate limits to keep database thin
+    cleanupExpiredRateLimits().catch(console.error);
+    prisma.verificationToken.deleteMany({
+      where: { expiresAt: { lt: new Date() } }
+    }).catch(console.error);
+
     const body: unknown = await request.json();
 
     // Validate using shared Zod schema
@@ -61,7 +84,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // If user is candidate, automatically initialize profile (no longer dependent on github verify)
+      // If user is candidate, automatically initialize profile
       if (role === "CANDIDATE") {
         await tx.candidateProfile.create({
           data: {
